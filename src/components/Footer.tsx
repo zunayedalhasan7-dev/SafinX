@@ -6,11 +6,14 @@ export default function Footer() {
     <footer className="bg-black border-t border-white/5 pt-20 pb-10 px-6">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
         <div className="col-span-1 md:col-span-1">
-          <Link to="/" className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-gradient-to-br from-neon-blue to-neon-purple rounded-lg flex items-center justify-center font-bold text-black">
-              S
-            </div>
-            <span className="text-xl font-bold tracking-tighter neon-text">SafinX</span>
+          <Link to="/" className="flex items-center gap-3 mb-8 group">
+            <img 
+              src="https://i.postimg.cc/hPTW2zTw/Blue-and-White-Modern-Online-Shop-Logo.png"
+              alt="SafinX Logo"
+              className="w-10 h-10 object-contain rounded-lg"
+              referrerPolicy="no-referrer"
+            />
+            <span className="text-2xl font-bold tracking-tighter text-white uppercase leading-none mt-1">SafinX</span>
           </Link>
           <p className="text-white/50 text-sm leading-relaxed mb-6">
             The ultimate platform for digital creators to sell ebooks, courses, templates, and more with ease.
@@ -41,10 +44,10 @@ export default function Footer() {
         <div>
           <h4 className="font-bold mb-6">Company</h4>
           <ul className="space-y-4 text-sm text-white/50">
-            <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-            <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+            <li><Link to="/about" className="hover:text-white transition-colors">About Us</Link></li>
+            <li><Link to="/careers" className="hover:text-white transition-colors">Careers</Link></li>
+            <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
           </ul>
         </div>
 

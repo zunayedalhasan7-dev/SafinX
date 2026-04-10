@@ -20,21 +20,20 @@ export default function Navbar() {
   return (
     <nav className="fixed top-8 left-0 right-0 z-50 px-6 pointer-events-none">
       <div className="max-w-7xl mx-auto glass rounded-[32px] px-6 lg:px-10 py-4 lg:py-5 flex items-center justify-between pointer-events-auto border-white/[0.05] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)]">
-        <Link to="/" className="flex items-center gap-4 group">
-          <motion.div 
-            whileHover={{ rotate: 180 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            className="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-xl lg:rounded-2xl flex items-center justify-center font-display text-black text-xl lg:text-2xl shadow-[0_0_30px_rgba(255,255,255,0.3)]"
-          >
-            S
-          </motion.div>
-          <span className="text-2xl lg:text-3xl font-display tracking-tighter text-white group-hover:neon-text transition-all uppercase">SafinX</span>
+        <Link to="/" className="flex items-center gap-3 lg:gap-4 group">
+          <motion.img 
+            whileHover={{ scale: 1.05 }}
+            src="https://i.postimg.cc/hPTW2zTw/Blue-and-White-Modern-Online-Shop-Logo.png"
+            alt="SafinX Logo"
+            className="w-12 h-12 lg:w-14 lg:h-14 object-contain rounded-xl lg:rounded-2xl"
+            referrerPolicy="no-referrer"
+          />
+          <span className="text-2xl lg:text-3xl font-display tracking-tighter text-white transition-all uppercase leading-none mt-1">SafinX</span>
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-12">
           <Link to="/marketplace" className="micro-label hover:text-white transition-all hover:tracking-[0.6em]">Marketplace</Link>
-          <Link to="/#process" className="micro-label hover:text-white transition-all hover:tracking-[0.6em]">Process</Link>
           {user && <Link to="/dashboard" className="micro-label text-neon-blue hover:text-white transition-all hover:tracking-[0.6em]">Dashboard</Link>}
         </div>
 
@@ -103,7 +102,6 @@ export default function Navbar() {
           >
             <div className="flex flex-col gap-8">
               <Link onClick={() => setIsMenuOpen(false)} to="/marketplace" className="text-3xl font-display uppercase tracking-tighter">Marketplace</Link>
-              <Link onClick={() => setIsMenuOpen(false)} to="/#process" className="text-3xl font-display uppercase tracking-tighter">Process</Link>
               {user && <Link onClick={() => setIsMenuOpen(false)} to="/dashboard" className="text-3xl font-display uppercase tracking-tighter text-neon-blue">Dashboard</Link>}
               
               <div className="h-px bg-white/5 my-4" />

@@ -19,6 +19,11 @@ import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
 import Downloads from './pages/Downloads';
 import Admin from './pages/Admin';
+import About from './pages/About';
+import Careers from './pages/Careers';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import ScrollToTop from './components/ScrollToTop';
 
 const PrivateRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { user, profile, loading, isAdmin, isSeller } = useAuth();
@@ -37,6 +42,7 @@ export default function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <ScrollToTop />
           <Toaster 
             position="top-center"
             toastOptions={{
@@ -94,6 +100,10 @@ export default function App() {
                   <Admin />
                 </PrivateRoute>
               } />
+              <Route path="/about" element={<About />} />
+              <Route path="/careers" element={<Careers />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
             </Routes>
           </Layout>
         </Router>
