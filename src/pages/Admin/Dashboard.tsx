@@ -25,6 +25,7 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import SeedData from '../../components/Admin/SeedData';
 
 const data = [
   { name: 'Mon', revenue: 4000, users: 240 },
@@ -90,6 +91,7 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <SeedData />
         {[
           { label: 'Total Revenue', value: `$${stats.totalRevenue.toLocaleString()}`, icon: <DollarSign />, trend: '+12.5%', color: 'neon-blue' },
           { label: 'Active Users', value: stats.totalUsers, icon: <Users />, trend: '+5.2%', color: 'neon-purple' },

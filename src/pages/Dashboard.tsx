@@ -23,10 +23,14 @@ import {
   Star,
   Sparkles,
   Zap,
-  Shield
+  Shield,
+  MoreVertical,
+  Eye,
+  Download
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
+import MoreMenu from '../components/MoreMenu';
 
 const data = [
   { name: 'Mon', sales: 4000 },
@@ -200,10 +204,10 @@ export default function Dashboard() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-grow lg:ml-72 p-4 lg:p-12 relative z-10 pb-32 lg:pb-12">
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 lg:mb-16 gap-4 lg:gap-6">
+      <main className="flex-grow lg:ml-72 p-3 lg:p-12 relative z-10 pb-32 lg:pb-12">
+        <header className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 lg:mb-16 gap-6 md:gap-6">
           <div>
-            <h1 className="text-3xl lg:text-5xl font-display uppercase tracking-tighter leading-none mb-1 lg:mb-2">{activeTab}</h1>
+            <h1 className="text-2xl md:text-4xl lg:text-5xl font-display uppercase tracking-tighter leading-none mb-1 lg:mb-2">{activeTab}</h1>
             <p className="micro-label text-white/20 text-[8px] lg:text-[10px]">Manage your digital ecosystem</p>
           </div>
           <div className="flex items-center justify-between sm:justify-end gap-4 lg:gap-6">
@@ -244,7 +248,7 @@ export default function Dashboard() {
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.1 }}
-                    className="premium-card p-8 border-white/5 group hover:border-white/10 transition-all"
+                    className="premium-card p-4 md:p-8 border-white/5 group hover:border-white/10 transition-all"
                   >
                     <div className="flex items-center justify-between mb-6">
                       <div className="w-12 h-12 rounded-xl glass flex items-center justify-center text-white/20 group-hover:text-neon-blue transition-colors">{stat.icon}</div>
@@ -471,10 +475,14 @@ export default function Dashboard() {
                           <td className="px-10 py-6 font-black text-2xl tracking-tighter">${product.price}</td>
                           <td className="px-10 py-6 text-white/40 font-black text-lg">{product.salesCount || 0}</td>
                           <td className="px-10 py-6 text-right">
-                            <div className="flex items-center justify-end gap-3">
-                              <button className="w-10 h-10 rounded-xl glass border-white/5 flex items-center justify-center hover:bg-white hover:text-black transition-all"><Edit className="w-4 h-4" /></button>
-                              <button onClick={() => handleDelete(product.id)} className="w-10 h-10 rounded-xl glass border-white/5 flex items-center justify-center hover:bg-red-500/10 text-red-400 transition-all"><Trash2 className="w-4 h-4" /></button>
-                            </div>
+                            <MoreMenu 
+                              items={[
+                                { label: 'View Asset', icon: <Eye className="w-4 h-4" />, to: `/product/${product.id}` },
+                                { label: 'Edit Details', icon: <Edit className="w-4 h-4" />, onClick: () => console.log('Edit', product.id) },
+                                { label: 'Download File', icon: <Download className="w-4 h-4" />, onClick: () => window.open(product.fileUrl) },
+                                { label: 'Delete Asset', icon: <Trash2 className="w-4 h-4 text-red-400" />, onClick: () => handleDelete(product.id) },
+                              ]}
+                            />
                           </td>
                         </tr>
                       ))}

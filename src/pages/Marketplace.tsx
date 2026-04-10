@@ -49,19 +49,19 @@ export default function Marketplace() {
         <div className="absolute bottom-[20%] left-[5%] w-[600px] h-[600px] bg-neon-purple/5 blur-[150px] rounded-full" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-32 relative z-10">
-        <div className="mb-32 text-center lg:text-left">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 pt-20 md:pt-32 relative z-10">
+        <div className="mb-12 md:mb-32 text-center lg:text-left">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="micro-label mb-8 flex items-center justify-center lg:justify-start gap-4">
+            <div className="micro-label mb-6 md:mb-8 flex items-center justify-center lg:justify-start gap-4">
               <span className="w-8 h-px bg-white/10" />
               Premium Marketplace
               <span className="w-8 h-px bg-white/10" />
             </div>
-            <h1 className="display-title mb-8">
+            <h1 className="text-3xl md:text-7xl lg:text-8xl font-display tracking-tighter leading-[0.85] mb-6 md:mb-8">
               DIGITAL <br /> <span className="neon-text">MARKETPLACE</span>
             </h1>
             <p className="text-white/40 max-w-xl mx-auto lg:mx-0 text-lg leading-relaxed">
@@ -72,7 +72,7 @@ export default function Marketplace() {
         </div>
 
         {/* Filters & Search */}
-        <div className="flex flex-col lg:flex-row gap-8 mb-24 items-center justify-between">
+        <div className="flex flex-col lg:flex-row gap-6 md:gap-8 mb-16 md:mb-24 items-center justify-between">
           <div className="relative group w-full lg:max-w-xl">
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-neon-blue transition-colors" />
             <input 
@@ -80,11 +80,11 @@ export default function Marketplace() {
               placeholder="Search assets..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full glass border-white/5 rounded-2xl pl-16 pr-6 py-5 focus:outline-none focus:border-white/20 focus:bg-white/[0.03] transition-all text-lg placeholder:text-white/10"
+              className="w-full glass border-white/5 rounded-2xl pl-16 pr-6 py-4 md:py-5 focus:outline-none focus:border-white/20 focus:bg-white/[0.03] transition-all text-base md:text-lg placeholder:text-white/10"
             />
           </div>
           
-          <div className="flex flex-wrap justify-center lg:justify-end gap-3 w-full">
+          <div className="flex flex-wrap justify-center lg:justify-end gap-2 md:gap-3 w-full">
             {categories.map((cat, i) => (
               <motion.button
                 key={cat}
@@ -92,7 +92,7 @@ export default function Marketplace() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 onClick={() => setCategory(cat)}
-                className={`px-6 py-3 rounded-xl micro-label transition-all duration-300 ${
+                className={`px-4 md:px-6 py-2 md:py-3 rounded-xl micro-label text-[8px] md:text-[10px] transition-all duration-300 ${
                   category === cat 
                   ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.1)] scale-105' 
                   : 'glass hover:bg-white/5 text-white/30 border-white/5'
@@ -135,7 +135,7 @@ export default function Marketplace() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </Link>
                 
-                <div className="p-10 flex-grow flex flex-col">
+                <div className="p-6 md:p-10 flex-grow flex flex-col">
                   <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full glass flex items-center justify-center overflow-hidden border-white/10">

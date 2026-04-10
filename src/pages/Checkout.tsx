@@ -77,16 +77,16 @@ export default function Checkout() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 pb-32">
-      <Link to="/cart" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-12 text-sm">
+    <div className="max-w-7xl mx-auto px-6 pb-32 pt-20 md:pt-0">
+      <Link to="/cart" className="inline-flex items-center gap-2 text-white/40 hover:text-white transition-colors mb-8 md:mb-12 text-sm">
         <ArrowLeft className="w-4 h-4" /> Back to cart
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-        <div className="space-y-12">
-          <h1 className="text-4xl font-black tracking-tight">Checkout</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-20">
+        <div className="space-y-6 md:space-y-12">
+          <h1 className="text-2xl md:text-4xl font-black tracking-tight uppercase">Checkout</h1>
           
-          <div className="glass p-8 rounded-[32px] space-y-8">
+          <div className="glass p-5 md:p-8 rounded-[24px] md:rounded-[32px] space-y-6 md:space-y-8">
             <h2 className="text-xl font-bold flex items-center gap-3">
               <CreditCard className="w-5 h-5 text-neon-blue" /> Payment Method
             </h2>

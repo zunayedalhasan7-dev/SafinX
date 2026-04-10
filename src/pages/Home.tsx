@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, Shield, Globe, Star, Users, TrendingUp, ShoppingCart, Heart, Eye, Layers, Code, Palette, BookOpen, GraduationCap, Sparkles } from 'lucide-react';
-import { collection, query, limit, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, limit, getDocs, orderBy, where } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function Home() {
@@ -12,7 +12,12 @@ export default function Home() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(4));
+        const q = query(
+          collection(db, 'products'), 
+          where('status', '==', 'approved'),
+          orderBy('createdAt', 'desc'), 
+          limit(4)
+        );
         const snapshot = await getDocs(q);
         setFeaturedProducts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       } catch (err) {
@@ -33,9 +38,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-24 md:space-y-48 pb-24 md:pb-48 overflow-hidden">
+    <div className="space-y-16 md:space-y-48 pb-16 md:pb-48 overflow-hidden">
       {/* Hero Section */}
-      <section className="relative min-h-[80vh] md:min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 md:pt-20 overflow-hidden">
+      <section className="relative min-h-[70vh] md:min-h-screen flex items-center justify-center px-4 sm:px-6 pt-20 md:pt-20 overflow-hidden">
         {/* Floating Illustrations */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden hidden md:block">
           <motion.div 
@@ -84,7 +89,7 @@ export default function Home() {
               <span className="w-8 md:w-12 h-px bg-white/10" />
             </div>
             
-            <h1 className="display-title mb-8 md:mb-12">
+            <h1 className="text-3xl sm:text-6xl md:text-8xl lg:text-9xl font-display tracking-tighter leading-[0.85] mb-6 md:mb-12">
               BUILD YOUR <br /> 
               <span className="neon-text">DIGITAL EMPIRE</span>
             </h1>
@@ -117,7 +122,7 @@ export default function Home() {
               <span className="w-8 h-px bg-neon-blue" />
               Platform Capabilities
             </div>
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-display uppercase tracking-tighter leading-[0.9] md:leading-[0.85] mb-8 md:mb-12">
+            <h2 className="text-2xl sm:text-5xl md:text-7xl lg:text-8xl font-display uppercase tracking-tighter leading-[0.9] md:leading-[0.85] mb-6 md:mb-12">
               ENGINEERED FOR <br className="hidden sm:block" /> <span className="neon-text">CREATORS</span>
             </h2>
             <p className="text-white/40 text-sm md:text-xl mb-10 md:mb-16 leading-relaxed max-w-xl">
@@ -161,30 +166,30 @@ export default function Home() {
               <motion.div 
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute top-10 right-10 md:top-20 md:right-20 glass p-4 md:p-6 rounded-2xl md:rounded-3xl border-white/10 shadow-2xl"
+                className="absolute top-6 right-6 md:top-20 md:right-20 glass p-3 md:p-6 rounded-xl md:rounded-3xl border-white/10 shadow-2xl"
               >
-                <div className="flex items-center gap-3 md:gap-4">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
-                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
+                <div className="flex items-center gap-2 md:gap-4">
+                  <div className="w-6 h-6 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+                    <TrendingUp className="w-3 h-3 md:w-5 md:h-5" />
                   </div>
                   <div>
-                    <p className="micro-label text-white/20 text-[8px] md:text-[10px]">Daily Revenue</p>
-                    <p className="text-sm md:text-xl font-black text-white">+$2,450.00</p>
+                    <p className="micro-label text-white/20 text-[6px] md:text-[10px]">Daily Revenue</p>
+                    <p className="text-[10px] md:text-xl font-black text-white">+$2,450.00</p>
                   </div>
                 </div>
               </motion.div>
               <motion.div 
                 animate={{ y: [0, 20, 0] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                className="absolute bottom-10 left-10 md:bottom-20 md:left-20 glass p-4 md:p-6 rounded-2xl md:rounded-3xl border-white/10 shadow-2xl"
+                className="absolute bottom-6 left-6 md:bottom-20 md:left-20 glass p-3 md:p-6 rounded-xl md:rounded-3xl border-white/10 shadow-2xl"
               >
-                <div className="flex items-center gap-3 md:gap-4">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue">
-                    <Users className="w-4 h-4 md:w-5 md:h-5" />
+                <div className="flex items-center gap-2 md:gap-4">
+                  <div className="w-6 h-6 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue">
+                    <Users className="w-3 h-3 md:w-5 md:h-5" />
                   </div>
                   <div>
-                    <p className="micro-label text-white/20 text-[8px] md:text-[10px]">New Customers</p>
-                    <p className="text-sm md:text-xl font-black text-white">+128</p>
+                    <p className="micro-label text-white/20 text-[6px] md:text-[10px]">New Customers</p>
+                    <p className="text-[10px] md:text-xl font-black text-white">+128</p>
                   </div>
                 </div>
               </motion.div>
@@ -195,10 +200,10 @@ export default function Home() {
 
       {/* Featured Products Grid */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 md:mb-24 gap-8">
           <div>
-            <div className="micro-label mb-4">Curated Selection</div>
-            <h2 className="text-4xl sm:text-5xl md:text-7xl font-display uppercase tracking-tighter leading-[0.9] md:leading-none">
+            <div className="micro-label mb-3">Curated Selection</div>
+            <h2 className="text-2xl sm:text-5xl md:text-7xl font-display uppercase tracking-tighter leading-[0.9] md:leading-none">
               FEATURED <br className="hidden sm:block" /> <span className="text-white/10">ASSETS</span>
             </h2>
           </div>
@@ -260,9 +265,9 @@ export default function Home() {
 
       {/* Categories Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-16 md:mb-24">
-          <div className="micro-label mb-4">Explore Niches</div>
-          <h2 className="text-4xl md:text-7xl font-display uppercase tracking-tighter">
+        <div className="text-center mb-12 md:mb-24">
+          <div className="micro-label mb-3">Explore Niches</div>
+          <h2 className="text-2xl md:text-6xl lg:text-7xl font-display uppercase tracking-tighter">
             BROWSE BY <br /> <span className="text-white/10">CATEGORY</span>
           </h2>
         </div>
@@ -288,12 +293,12 @@ export default function Home() {
 
       {/* Stats Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12">
           {[
-            { label: 'Total Creators', value: '12k+', icon: <Users className="w-5 h-5 md:w-6 md:h-6" /> },
-            { label: 'Digital Assets', value: '45k+', icon: <Zap className="w-5 h-5 md:w-6 md:h-6" /> },
-            { label: 'Global Sales', value: '$2.4M', icon: <TrendingUp className="w-5 h-5 md:w-6 md:h-6" /> },
-            { label: 'Secure Payouts', value: '100%', icon: <Shield className="w-5 h-5 md:w-6 md:h-6" /> },
+            { label: 'Total Creators', value: '12k+', icon: <Users className="w-4 h-4 md:w-6 md:h-6" /> },
+            { label: 'Digital Assets', value: '45k+', icon: <Zap className="w-4 h-4 md:w-6 md:h-6" /> },
+            { label: 'Global Sales', value: '$2.4M', icon: <TrendingUp className="w-4 h-4 md:w-6 md:h-6" /> },
+            { label: 'Secure Payouts', value: '100%', icon: <Shield className="w-4 h-4 md:w-6 md:h-6" /> },
           ].map((stat, i) => (
             <motion.div 
               key={i}
@@ -301,13 +306,13 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="flex flex-col items-center text-center"
+              className="flex flex-col items-center text-center glass p-4 md:p-8 rounded-2xl md:rounded-[32px] border-white/5"
             >
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-[24px] glass flex items-center justify-center text-neon-blue mb-4 md:mb-8">
+              <div className="w-8 h-8 md:w-16 md:h-16 rounded-xl md:rounded-[24px] bg-neon-blue/10 flex items-center justify-center text-neon-blue mb-2 md:mb-8">
                 {stat.icon}
               </div>
-              <p className="text-2xl md:text-4xl font-black tracking-tighter mb-1 md:mb-2">{stat.value}</p>
-              <p className="micro-label text-[8px] md:text-[10px]">{stat.label}</p>
+              <p className="text-xl md:text-4xl font-black tracking-tighter mb-0.5 md:mb-2">{stat.value}</p>
+              <p className="micro-label text-[7px] md:text-[10px] opacity-40">{stat.label}</p>
             </motion.div>
           ))}
         </div>
@@ -315,10 +320,10 @@ export default function Home() {
 
       {/* CTA Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="relative glass p-12 md:p-32 rounded-[40px] md:rounded-[60px] text-center overflow-hidden border-white/10">
+        <div className="relative glass p-10 md:p-32 rounded-[40px] md:rounded-[60px] text-center overflow-hidden border-white/10">
           <div className="relative z-10">
-            <div className="micro-label mb-8">Join the Revolution</div>
-            <h2 className="text-4xl md:text-8xl font-display uppercase tracking-tighter mb-12 leading-[0.85]">
+            <div className="micro-label mb-6">Join the Revolution</div>
+            <h2 className="text-2xl md:text-7xl lg:text-8xl font-display uppercase tracking-tighter mb-8 md:mb-12 leading-[0.85]">
               READY TO <br /> <span className="text-white/10">EXPLORE ASSETS?</span>
             </h2>
             <p className="text-white/40 mb-16 max-w-lg mx-auto text-base md:text-lg font-medium">

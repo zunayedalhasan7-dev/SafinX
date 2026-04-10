@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { auth } from '../firebase';
-import { ShoppingCart, User, LogOut, LayoutDashboard, Heart, Menu, X } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Heart, Menu, X, MoreVertical } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import MoreMenu from './MoreMenu';
 
 export default function Navbar() {
   const { user, profile } = useAuth();
@@ -18,17 +19,17 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed top-8 left-0 right-0 z-50 px-6 pointer-events-none">
-      <div className="max-w-7xl mx-auto glass rounded-[32px] px-6 lg:px-10 py-4 lg:py-5 flex items-center justify-between pointer-events-auto border-white/[0.05] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)]">
-        <Link to="/" className="flex items-center gap-3 lg:gap-4 group">
+    <nav className="fixed top-4 md:top-8 left-0 right-0 z-50 px-4 md:px-6 pointer-events-none">
+      <div className="max-w-7xl mx-auto glass rounded-[24px] md:rounded-[32px] px-4 md:px-6 lg:px-10 py-3 md:py-4 lg:py-5 flex items-center justify-between pointer-events-auto border-white/[0.05] shadow-[0_30px_100px_-20px_rgba(0,0,0,0.8)]">
+        <Link to="/" className="flex items-center gap-2 md:gap-3 lg:gap-4 group shrink-0">
           <motion.img 
             whileHover={{ scale: 1.05 }}
             src="https://i.postimg.cc/hPTW2zTw/Blue-and-White-Modern-Online-Shop-Logo.png"
             alt="SafinX Logo"
-            className="w-12 h-12 lg:w-14 lg:h-14 object-contain rounded-xl lg:rounded-2xl"
+            className="w-10 h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 object-contain rounded-lg md:rounded-xl lg:rounded-2xl"
             referrerPolicy="no-referrer"
           />
-          <span className="text-2xl lg:text-3xl font-display tracking-tighter text-white transition-all uppercase leading-none mt-1">SafinX</span>
+          <span className="text-xl md:text-2xl lg:text-3xl font-display tracking-tighter text-white transition-all uppercase leading-none mt-1">SafinX</span>
         </Link>
 
         {/* Desktop Menu */}
@@ -37,19 +38,20 @@ export default function Navbar() {
           {user && <Link to="/dashboard" className="micro-label text-neon-blue hover:text-white transition-all hover:tracking-[0.6em]">Dashboard</Link>}
         </div>
 
-        <div className="flex items-center gap-4 lg:gap-8">
-          <div className="flex items-center gap-2 lg:gap-4">
-            <Link to="/wishlist" className="p-2 lg:p-3 hover:bg-white/5 rounded-xl lg:rounded-2xl transition-colors relative group">
-              <Heart className="w-5 h-5 text-white/30 group-hover:text-red-400 transition-colors" />
+        <div className="flex items-center gap-2 md:gap-4 lg:gap-8">
+          <div className="flex items-center gap-1 md:gap-2 lg:gap-4">
+            <Link to="/wishlist" className="p-1.5 md:p-3 hover:bg-white/5 rounded-xl lg:rounded-2xl transition-colors relative group">
+              <Heart className="w-4 h-4 md:w-5 md:h-5 text-white/30 group-hover:text-red-400 transition-colors" />
             </Link>
-            <Link to="/cart" className="p-2 lg:p-3 hover:bg-white/5 rounded-xl lg:rounded-2xl transition-colors relative group">
-              <ShoppingCart className="w-5 h-5 text-white/30 group-hover:text-neon-blue transition-colors" />
+            <Link to="/cart" className="p-1.5 md:p-3 hover:bg-white/5 rounded-xl lg:rounded-2xl transition-colors relative group">
+              <ShoppingCart className="w-4 h-4 md:w-5 md:h-5 text-white/30 group-hover:text-neon-blue transition-colors" />
               {cart.length > 0 && (
-                <span className="absolute top-1 lg:top-2 right-1 lg:right-2 w-4 h-4 bg-neon-blue text-black text-[10px] font-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,242,255,0.5)]">
+                <span className="absolute top-0.5 md:top-2 right-0.5 md:right-2 w-3.5 h-3.5 md:w-4 md:h-4 bg-neon-blue text-black text-[8px] md:text-[10px] font-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,242,255,0.5)]">
                   {cart.length}
                 </span>
               )}
             </Link>
+            <MoreMenu className="hidden sm:block" />
           </div>
 
           <div className="h-8 w-px bg-white/10 hidden sm:block" />
@@ -84,9 +86,9 @@ export default function Navbar() {
           
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 lg:p-3 glass rounded-xl lg:rounded-2xl border-white/10"
+            className="lg:hidden p-1.5 md:p-3 glass rounded-xl lg:rounded-2xl border-white/10"
           >
-            {isMenuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+            {isMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
           </button>
         </div>
       </div>

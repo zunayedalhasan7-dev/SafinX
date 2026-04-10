@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from 'motion/react';
-import { Github, AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles, Twitter } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -14,6 +15,13 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate('/');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,12 +49,10 @@ export default function Auth() {
     }
   };
 
-  const handleSocialLogin = async (providerType: 'google' | 'twitter' | 'github') => {
+  const handleSocialLogin = async (providerType: 'google') => {
     try {
       let provider;
       if (providerType === 'google') provider = new GoogleAuthProvider();
-      else if (providerType === 'twitter') provider = new TwitterAuthProvider();
-      else if (providerType === 'github') provider = new GithubAuthProvider();
       else return;
 
       const result = await signInWithPopup(auth, provider);
@@ -82,13 +88,18 @@ export default function Auth() {
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md relative z-10"
       >
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-6 group">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center font-display text-black text-xl shadow-[0_0_20px_rgba(255,255,255,0.2)] group-hover:rotate-12 transition-transform">S</div>
-            <span className="text-2xl font-display tracking-tighter uppercase">SafinX</span>
+        <div className="text-center mb-6 md:mb-8">
+          <Link to="/" className="inline-flex items-center gap-3 mb-4 md:mb-6 group">
+            <img 
+              src="https://i.postimg.cc/hPTW2zTw/Blue-and-White-Modern-Online-Shop-Logo.png"
+              alt="SafinX Logo"
+              className="w-8 h-8 md:w-10 md:h-10 object-contain rounded-lg"
+              referrerPolicy="no-referrer"
+            />
+            <span className="text-xl md:text-2xl font-display tracking-tighter text-white uppercase leading-none mt-1">SafinX</span>
           </Link>
           
-          <h1 className="text-4xl font-display uppercase tracking-tighter mb-2 leading-none">
+          <h1 className="text-3xl md:text-4xl font-display uppercase tracking-tighter mb-2 leading-none">
             {isLogin ? 'WELCOME BACK' : 'CREATE ACCOUNT'}
           </h1>
           <p className="micro-label text-[8px]">
@@ -177,27 +188,14 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="flex justify-center">
             <button 
               onClick={() => handleSocialLogin('google')}
-              className="glass p-3 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group"
+              className="glass px-8 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-all group w-full"
               title="Google"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
-            </button>
-            <button 
-              onClick={() => handleSocialLogin('twitter')}
-              className="glass p-3 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group"
-              title="Twitter (X)"
-            >
-              <Twitter className="w-5 h-5 text-white" />
-            </button>
-            <button 
-              onClick={() => handleSocialLogin('github')}
-              className="glass p-3 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group"
-              title="GitHub"
-            >
-              <Github className="w-5 h-5 text-white" />
+              <span className="text-xs font-bold uppercase tracking-widest">Continue with Google</span>
             </button>
           </div>
 

@@ -24,6 +24,7 @@ import Careers from './pages/Careers';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import ScrollToTop from './components/ScrollToTop';
+import CookieConsent from './components/CookieConsent';
 
 const PrivateRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
   const { user, profile, loading, isAdmin, isSeller } = useAuth();
@@ -58,6 +59,7 @@ export default function App() {
             }}
           />
           <Layout>
+            <CookieConsent />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/marketplace" element={<Marketplace />} />

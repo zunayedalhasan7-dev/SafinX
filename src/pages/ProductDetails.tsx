@@ -60,19 +60,19 @@ export default function ProductDetails() {
         <div className="absolute bottom-[20%] right-[5%] w-[500px] h-[500px] bg-neon-purple/5 blur-[150px] rounded-full" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 pt-32 relative z-10">
-        <Link to="/marketplace" className="inline-flex items-center gap-4 text-white/20 hover:text-white transition-all mb-16 micro-label group">
+      <div className="max-w-7xl mx-auto px-6 pt-24 relative z-10">
+        <Link to="/marketplace" className="inline-flex items-center gap-4 text-white/20 hover:text-white transition-all mb-10 md:mb-16 micro-label group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-2 transition-transform" /> Back to marketplace
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
           {/* Left: Content */}
-          <div className="lg:col-span-8 space-y-24">
+          <div className="lg:col-span-8 space-y-8 md:space-y-24">
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="aspect-video glass rounded-[60px] overflow-hidden border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative group"
+              className="aspect-video glass rounded-[24px] md:rounded-[60px] overflow-hidden border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative group"
             >
               <img 
                 src={product.thumbnailUrl || `https://picsum.photos/seed/${product.id}/1200/800`} 
@@ -100,7 +100,7 @@ export default function ProductDetails() {
                 </div>
               </div>
               
-              <h1 className="text-6xl md:text-8xl font-display uppercase tracking-tighter leading-[0.85]">{product.title}</h1>
+              <h1 className="text-3xl md:text-6xl lg:text-8xl font-display uppercase tracking-tighter leading-[0.85]">{product.title}</h1>
               
               <div className="flex items-center gap-6 pt-6">
                 <div className="w-16 h-16 rounded-2xl glass border border-white/10 p-1 overflow-hidden">
@@ -118,7 +118,7 @@ export default function ProductDetails() {
               </div>
             </div>
 
-            <div className="premium-card space-y-12 border-white/5 p-12 md:p-16">
+            <div className="premium-card space-y-8 md:space-y-12 border-white/5 p-6 md:p-16">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-neon-blue">
                   <Zap className="w-5 h-5" />
@@ -162,7 +162,7 @@ export default function ProductDetails() {
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="glass p-12 rounded-[60px] border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden"
+                className="glass p-8 md:p-12 rounded-[40px] md:rounded-[60px] border-white/10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] relative overflow-hidden"
               >
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-16">
@@ -204,7 +204,7 @@ export default function ProductDetails() {
                 <div className="absolute top-0 right-0 w-48 h-48 bg-neon-blue/10 blur-[100px] -z-10" />
               </motion.div>
 
-              <div className="glass p-12 rounded-[60px] border-white/5">
+              <div className="glass p-8 md:p-12 rounded-[40px] md:rounded-[60px] border-white/5">
                 <h4 className="micro-label mb-10">Curator</h4>
                 <div className="flex items-center gap-6 mb-12">
                   <div className="w-20 h-20 rounded-3xl glass border border-white/10 p-1 overflow-hidden">
