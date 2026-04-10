@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithPopup, GoogleAuthProvider, FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, GithubAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from 'motion/react';
-import { Github, AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles, Facebook, Twitter } from 'lucide-react';
+import { Github, AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles, Twitter } from 'lucide-react';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,11 +41,10 @@ export default function Auth() {
     }
   };
 
-  const handleSocialLogin = async (providerType: 'google' | 'facebook' | 'twitter' | 'github') => {
+  const handleSocialLogin = async (providerType: 'google' | 'twitter' | 'github') => {
     try {
       let provider;
       if (providerType === 'google') provider = new GoogleAuthProvider();
-      else if (providerType === 'facebook') provider = new FacebookAuthProvider();
       else if (providerType === 'twitter') provider = new TwitterAuthProvider();
       else if (providerType === 'github') provider = new GithubAuthProvider();
       else return;
@@ -178,20 +177,13 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <button 
               onClick={() => handleSocialLogin('google')}
               className="glass p-3 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group"
               title="Google"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />
-            </button>
-            <button 
-              onClick={() => handleSocialLogin('facebook')}
-              className="glass p-3 rounded-xl flex items-center justify-center hover:bg-white/5 transition-all group"
-              title="Facebook"
-            >
-              <Facebook className="w-5 h-5 text-[#1877F2]" />
             </button>
             <button 
               onClick={() => handleSocialLogin('twitter')}

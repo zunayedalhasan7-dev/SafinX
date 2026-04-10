@@ -33,7 +33,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="space-y-48 pb-48 overflow-hidden">
+    <div className="space-y-24 md:space-y-48 pb-24 md:pb-48 overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[80vh] md:min-h-screen flex items-center justify-center px-4 sm:px-6 pt-24 md:pt-20 overflow-hidden">
         {/* Floating Illustrations */}
@@ -111,39 +111,39 @@ export default function Home() {
 
       {/* Features Section - SaaS Style */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-24 items-center">
           <div>
             <div className="micro-label mb-6 flex items-center gap-4">
               <span className="w-8 h-px bg-neon-blue" />
               Platform Capabilities
             </div>
-            <h2 className="text-6xl md:text-8xl font-display uppercase tracking-tighter leading-[0.85] mb-12">
-              ENGINEERED FOR <br /> <span className="neon-text">CREATORS</span>
+            <h2 className="text-4xl sm:text-6xl md:text-8xl font-display uppercase tracking-tighter leading-[0.9] md:leading-[0.85] mb-8 md:mb-12">
+              ENGINEERED FOR <br className="hidden sm:block" /> <span className="neon-text">CREATORS</span>
             </h2>
-            <p className="text-white/40 text-xl mb-16 leading-relaxed max-w-xl">
+            <p className="text-white/40 text-sm md:text-xl mb-10 md:mb-16 leading-relaxed max-w-xl">
               SafinX provides the infrastructure you need to scale your digital business globally. 
               From secure delivery to advanced analytics, we've got you covered.
             </p>
-            <div className="space-y-8">
+            <div className="space-y-6 md:space-y-8">
               {[
                 { title: 'Instant Global Delivery', desc: 'Your products reach customers in seconds, anywhere in the world.', icon: <Globe className="w-6 h-6" /> },
                 { title: 'Secure Transactions', desc: 'Enterprise-grade security for every single purchase.', icon: <Shield className="w-6 h-6" /> },
                 { title: 'Advanced Analytics', desc: 'Deep insights into your sales performance and customer behavior.', icon: <TrendingUp className="w-6 h-6" /> },
               ].map((feature, i) => (
-                <div key={i} className="flex gap-8 group">
-                  <div className="w-14 h-14 rounded-2xl glass flex items-center justify-center text-white/20 group-hover:text-neon-blue group-hover:shadow-[0_0_20px_rgba(0,242,255,0.2)] transition-all shrink-0">
+                <div key={i} className="flex gap-4 md:gap-8 group">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl glass flex items-center justify-center text-white/20 group-hover:text-neon-blue group-hover:shadow-[0_0_20px_rgba(0,242,255,0.2)] transition-all shrink-0">
                     {feature.icon}
                   </div>
                   <div>
-                    <h4 className="text-xl font-bold uppercase tracking-tight mb-2 group-hover:text-white transition-colors">{feature.title}</h4>
-                    <p className="text-white/20 leading-relaxed">{feature.desc}</p>
+                    <h4 className="text-lg md:text-xl font-bold uppercase tracking-tight mb-1 md:mb-2 group-hover:text-white transition-colors">{feature.title}</h4>
+                    <p className="text-xs md:text-base text-white/20 leading-relaxed">{feature.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="relative">
-            <div className="aspect-square glass rounded-[80px] border-white/5 relative overflow-hidden group">
+          <div className="relative mt-12 lg:mt-0">
+            <div className="aspect-square glass rounded-[40px] md:rounded-[80px] border-white/5 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-br from-neon-blue/10 to-neon-purple/10 opacity-50" />
               <div className="absolute inset-10 border border-white/5 rounded-[60px] flex items-center justify-center">
                 <motion.div
@@ -161,30 +161,30 @@ export default function Home() {
               <motion.div 
                 animate={{ y: [0, -20, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
-                className="absolute top-20 right-20 glass p-6 rounded-3xl border-white/10 shadow-2xl"
+                className="absolute top-10 right-10 md:top-20 md:right-20 glass p-4 md:p-6 rounded-2xl md:rounded-3xl border-white/10 shadow-2xl"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
-                    <TrendingUp className="w-5 h-5" />
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-green-500/20 flex items-center justify-center text-green-400">
+                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
                   </div>
                   <div>
-                    <p className="micro-label text-white/20">Daily Revenue</p>
-                    <p className="text-xl font-black text-white">+$2,450.00</p>
+                    <p className="micro-label text-white/20 text-[8px] md:text-[10px]">Daily Revenue</p>
+                    <p className="text-sm md:text-xl font-black text-white">+$2,450.00</p>
                   </div>
                 </div>
               </motion.div>
               <motion.div 
                 animate={{ y: [0, 20, 0] }}
                 transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-                className="absolute bottom-20 left-20 glass p-6 rounded-3xl border-white/10 shadow-2xl"
+                className="absolute bottom-10 left-10 md:bottom-20 md:left-20 glass p-4 md:p-6 rounded-2xl md:rounded-3xl border-white/10 shadow-2xl"
               >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue">
-                    <Users className="w-5 h-5" />
+                <div className="flex items-center gap-3 md:gap-4">
+                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue">
+                    <Users className="w-4 h-4 md:w-5 md:h-5" />
                   </div>
                   <div>
-                    <p className="micro-label text-white/20">New Customers</p>
-                    <p className="text-xl font-black text-white">+128</p>
+                    <p className="micro-label text-white/20 text-[8px] md:text-[10px]">New Customers</p>
+                    <p className="text-sm md:text-xl font-black text-white">+128</p>
                   </div>
                 </div>
               </motion.div>
@@ -195,14 +195,14 @@ export default function Home() {
 
       {/* Featured Products Grid */}
       <section className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-24 gap-8">
           <div>
             <div className="micro-label mb-4">Curated Selection</div>
-            <h2 className="text-5xl md:text-7xl font-display uppercase tracking-tighter">
-              FEATURED <br /> <span className="text-white/10">ASSETS</span>
+            <h2 className="text-4xl sm:text-5xl md:text-7xl font-display uppercase tracking-tighter leading-[0.9] md:leading-none">
+              FEATURED <br className="hidden sm:block" /> <span className="text-white/10">ASSETS</span>
             </h2>
           </div>
-          <Link to="/marketplace" className="micro-label hover:text-neon-blue transition-colors flex items-center gap-3">
+          <Link to="/marketplace" className="micro-label hover:text-neon-blue transition-colors flex items-center gap-3 bg-white/5 md:bg-transparent px-6 py-4 md:p-0 rounded-2xl border border-white/5 md:border-none w-full md:w-auto justify-center">
             View All Marketplace <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
