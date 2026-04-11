@@ -48,6 +48,7 @@ export default function AdminDashboard() {
   const [recentUsers, setRecentUsers] = useState<any[]>([]);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -55,6 +56,7 @@ export default function AdminDashboard() {
 
   const fetchDashboardData = async () => {
     setLoading(true);
+    setError(null);
     try {
       // In a real app, these would be aggregated or fetched from a stats collection
       const usersSnap = await getDocs(collection(db, 'users'));
@@ -79,12 +81,42 @@ export default function AdminDashboard() {
       const recentUsersSnap = await getDocs(qUsers);
       setRecentUsers(recentUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching admin stats:", err);
+      setError(err.message || "Failed to fetch dashboard data. Please check your permissions.");
     } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-12 h-12 border-4 border-neon-blue border-t-transparent rounded-full animate-spin" />
+        <p className="text-white/40 micro-label animate-pulse">Initializing Platform Overview...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-6 text-center">
+        <div className="w-20 h-20 rounded-3xl bg-red-500/10 flex items-center justify-center text-red-500">
+          <Clock className="w-10 h-10" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-display uppercase tracking-tighter mb-2">Access Restricted</h2>
+          <p className="text-white/40 text-sm max-w-md mx-auto">{error}</p>
+        </div>
+        <button 
+          onClick={fetchDashboardData}
+          className="btn-secondary px-8 py-3 micro-label"
+        >
+          Retry Connection
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">

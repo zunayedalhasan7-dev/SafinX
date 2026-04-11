@@ -28,42 +28,47 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
-      
-      if (firebaseUser) {
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        const userDoc = await getDoc(userDocRef);
+      try {
+        setUser(firebaseUser);
         
-        const isAdminEmail = firebaseUser.email === 'xpzunayed@gmail.com';
-        const targetRole = isAdminEmail ? 'admin' : 'buyer';
+        if (firebaseUser) {
+          const userDocRef = doc(db, 'users', firebaseUser.uid);
+          const userDoc = await getDoc(userDocRef);
+          
+          const isAdminEmail = firebaseUser.email === 'xpzunayed@gmail.com';
+          const targetRole = isAdminEmail ? 'admin' : 'buyer';
 
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          // Sync role if it's the admin email but role isn't admin, 
-          // OR if it's NOT the admin email but role IS admin (security fallback)
-          if ((isAdminEmail && data.role !== 'admin') || (!isAdminEmail && data.role === 'admin')) {
-            await setDoc(userDocRef, { ...data, role: targetRole }, { merge: true });
-            setProfile({ ...data, role: targetRole });
+          if (userDoc.exists()) {
+            const data = userDoc.data();
+            // Sync role if it's the admin email but role isn't admin, 
+            // OR if it's NOT the admin email but role IS admin (security fallback)
+            if ((isAdminEmail && data.role !== 'admin') || (!isAdminEmail && data.role === 'admin')) {
+              await setDoc(userDocRef, { ...data, role: targetRole }, { merge: true });
+              setProfile({ ...data, role: targetRole });
+            } else {
+              setProfile(data);
+            }
           } else {
-            setProfile(data);
+            // Create default profile for new user
+            const newProfile = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName || 'User',
+              photoURL: firebaseUser.photoURL || '',
+              role: targetRole,
+              createdAt: serverTimestamp(),
+            };
+            await setDoc(userDocRef, newProfile);
+            setProfile(newProfile);
           }
         } else {
-          // Create default profile for new user
-          const newProfile = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName || 'User',
-            photoURL: firebaseUser.photoURL || '',
-            role: targetRole,
-            createdAt: serverTimestamp(),
-          };
-          await setDoc(userDocRef, newProfile);
-          setProfile(newProfile);
+          setProfile(null);
         }
-      } else {
-        setProfile(null);
+      } catch (error) {
+        console.error("Auth initialization error:", error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
