@@ -119,7 +119,7 @@ export default function AdminProducts() {
     setSubmitting(true);
     try {
       let thumbnailUrl = isEditing ? products.find(p => p.id === currentProductId)?.thumbnailUrl : '';
-      let fileUrl = isEditing ? products.find(p => p.id === currentProductId)?.fileUrl : '';
+      let fileUrl = isEditing ? products.find(p => p.id === currentProductId)?.fileURL : '';
 
       if (thumbnail) {
         const thumbRef = ref(storage, `thumbnails/admin/${Date.now()}_${thumbnail.name}`);
@@ -144,9 +144,9 @@ export default function AdminProducts() {
         description: formData.description,
         price: parseFloat(formData.price),
         category: formData.category,
-        status: formData.status,
+        status: 'active',
         thumbnailUrl,
-        fileUrl,
+        fileURL: fileUrl,
         sellerId: user.uid,
         sellerName: profile?.displayName || 'Admin',
         updatedAt: serverTimestamp(),

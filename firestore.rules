@@ -25,7 +25,7 @@ service cloud.firestore {
     //   - price: number (required, >= 0)
     //   - category: string (required)
     //   - thumbnailUrl: string (required, url format)
-    //   - fileUrl: string (required, url format)
+    //   - fileURL: string (required, url format)
     //   - sellerId: string (required, matches auth.uid)
     //   - sellerName: string (required)
     //   - rating: number (0-5)
@@ -61,9 +61,7 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isAuthenticated() && 
-        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
-         (request.auth.token.email == "xpzunayed@gmail.com" && request.auth.token.email_verified == true));
+      return isAuthenticated() && request.auth.token.email == "xpzunayed@gmail.com";
     }
 
     function isValidEmail(email) {
@@ -87,12 +85,12 @@ service cloud.firestore {
     }
 
     function isValidProduct(data) {
-      return data.keys().hasAll(['title', 'price', 'sellerId', 'status', 'thumbnailUrl', 'fileUrl']) &&
+      return data.keys().hasAll(['title', 'price', 'sellerId', 'status', 'thumbnailUrl', 'fileURL']) &&
              data.title is string && data.title.size() > 0 && data.title.size() <= 100 &&
              data.price is number && data.price >= 0 &&
-             data.status in ['pending', 'approved', 'rejected'] &&
+             data.status in ['pending', 'approved', 'rejected', 'active'] &&
              isValidUrl(data.thumbnailUrl) &&
-             isValidUrl(data.fileUrl) &&
+             isValidUrl(data.fileURL) &&
              data.description is string && data.description.size() <= 5000;
     }
 
@@ -109,32 +107,20 @@ service cloud.firestore {
 
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      
-      allow create: if isOwner(userId) && isValidUser(request.resource.data) && 
-                      (request.resource.data.role != 'admin' || isAdmin());
-      
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) &&
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
                       (request.resource.data.role == resource.data.role || isAdmin());
     }
 
     match /products/{productId} {
-      allow read: if true; // Anyone can read products
-      
-      allow create: if isAdmin() && isValidProduct(request.resource.data);
-      
-      allow update: if isAdmin() && isValidProduct(request.resource.data);
-      
-      allow delete: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
     match /orders/{orderId} {
-      allow read: if isOwner(resource.data.buyerId) || isOwner(resource.data.sellerId) || isAdmin();
-      
-      // Only buyers can create orders for themselves
-      allow create: if isAuthenticated() && isValidOrder(request.resource.data);
-      
-      // Orders are generally immutable
-      allow update: if isAdmin();
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
   }
 }

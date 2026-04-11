@@ -4,8 +4,9 @@ import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, create
 import { auth, db } from '../firebase';
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { motion } from 'motion/react';
-import { AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles } from 'lucide-react';
+import { AlertCircle, ArrowLeft, Shield, Lock, User, Mail, Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,33 +24,76 @@ export default function Auth() {
     }
   }, [user, authLoading, navigate]);
 
+  const validateForm = () => {
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return false;
+    }
+    if (!isLogin && !name) {
+      setError('Please enter your full name');
+      return false;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    return true;
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     setLoading(true);
     setError('');
 
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+        toast.success('Welcome back to SafinX!');
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const isAdminEmail = email === 'xpzunayed@gmail.com';
+        const targetRole = isAdminEmail ? 'admin' : 'buyer';
+        
         await setDoc(doc(db, 'users', userCredential.user.uid), {
           uid: userCredential.user.uid,
           email,
           displayName: name,
-          role: 'buyer',
+          role: targetRole,
           createdAt: serverTimestamp(),
         });
+        toast.success('Account created successfully!');
       }
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
+      let message = 'An unexpected error occurred';
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        message = 'Invalid email or password';
+      } else if (err.code === 'auth/email-already-in-use') {
+        message = 'This email is already registered';
+      } else if (err.code === 'auth/invalid-email') {
+        message = 'Invalid email address';
+      } else if (err.code === 'auth/weak-password') {
+        message = 'Password is too weak';
+      } else if (err.code === 'auth/too-many-requests') {
+        message = 'Too many attempts. Please try again later';
+      }
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSocialLogin = async (providerType: 'google') => {
+    setLoading(true);
+    setError('');
     try {
       let provider;
       if (providerType === 'google') provider = new GoogleAuthProvider();
@@ -68,9 +112,15 @@ export default function Auth() {
           createdAt: serverTimestamp(),
         });
       }
+      toast.success('Logged in successfully!');
       navigate('/');
     } catch (err: any) {
-      setError(err.message);
+      if (err.code !== 'auth/popup-closed-by-user') {
+        setError(err.message);
+        toast.error('Social login failed');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,7 +181,7 @@ export default function Auth() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full glass border-white/5 rounded-xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-neon-blue/30 focus:bg-white/[0.05] transition-all placeholder:text-white/10 text-sm"
-                    required
+                    required={!isLogin}
                   />
                 </div>
               </div>
@@ -173,9 +223,16 @@ export default function Auth() {
             <button 
               type="submit" 
               disabled={loading}
-              className="btn-primary w-full py-4 mt-2 text-xs"
+              className="btn-primary w-full py-4 mt-2 text-xs flex items-center justify-center gap-2"
             >
-              {loading ? 'Processing...' : isLogin ? 'Authorize' : 'Create Account'}
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                isLogin ? 'Authorize' : 'Create Account'
+              )}
             </button>
           </form>
 
@@ -191,7 +248,8 @@ export default function Auth() {
           <div className="flex justify-center">
             <button 
               onClick={() => handleSocialLogin('google')}
-              className="glass px-8 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-all group w-full"
+              disabled={loading}
+              className="glass px-8 py-3 rounded-xl flex items-center justify-center gap-3 hover:bg-white/5 transition-all group w-full disabled:opacity-50"
               title="Google"
             >
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" className="w-5 h-5" alt="Google" />

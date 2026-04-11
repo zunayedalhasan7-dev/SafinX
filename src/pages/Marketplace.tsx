@@ -1,13 +1,47 @@
 import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { motion } from 'motion/react';
-import { Search, Filter, Star, ArrowRight, ShoppingCart, Sparkles, Globe, Zap } from 'lucide-react';
+import { motion, useSpring } from 'motion/react';
+import { Search, Filter, Star, ArrowRight, ShoppingCart, Sparkles, Globe, Zap, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const TiltCard = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
+  const x = useSpring(0, { stiffness: 100, damping: 30 });
+  const y = useSpring(0, { stiffness: 100, damping: 30 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = (mouseX / width - 0.5) * 20;
+    const yPct = (mouseY / height - 0.5) * -20;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX: y, rotateY: x, transformStyle: "preserve-3d" }}
+      className={`perspective-1000 ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 export default function Marketplace() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
@@ -16,17 +50,25 @@ export default function Marketplace() {
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
+      setError(null);
       try {
-        let q = query(collection(db, 'products'), where('status', '==', 'approved'));
+        // Workaround for missing composite index:
+        // Fetch all products and filter in memory
+        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
         
-        if (category !== 'All') {
-          q = query(q, where('category', '==', category));
-        }
-
         const snapshot = await getDocs(q);
-        const fetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        setProducts(fetched);
+        const allFetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        const filtered = allFetched.filter((p: any) => {
+          const isApproved = p.status === 'approved';
+          const matchesCategory = category === 'All' || p.category === category;
+          return isApproved && matchesCategory;
+        });
+
+        setProducts(filtered);
       } catch (err) {
+        console.error("Marketplace fetch error:", err);
+        setError("Failed to load products. Please try again later.");
         handleFirestoreError(err, OperationType.LIST, 'products');
       } finally {
         setLoading(false);
@@ -111,6 +153,12 @@ export default function Marketplace() {
               <div key={i} className="glass rounded-[40px] aspect-[4/5] animate-pulse" />
             ))}
           </div>
+        ) : error ? (
+          <div className="text-center py-24 glass rounded-[60px] border-red-500/20">
+            <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-6" />
+            <h3 className="text-3xl font-display uppercase tracking-tighter mb-4">Error Loading Assets</h3>
+            <p className="text-white/20 max-w-md mx-auto">{error}</p>
+          </div>
         ) : filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
             {filteredProducts.map((product, i) => (
@@ -120,48 +168,52 @@ export default function Marketplace() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: (i % 3) * 0.1, ease: [0.16, 1, 0.3, 1] }}
                 viewport={{ once: true }}
-                className="group premium-card p-0 overflow-hidden flex flex-col"
+                className="group flex flex-col"
               >
-                <Link to={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden">
-                  <img 
-                    src={product.thumbnailUrl || `https://picsum.photos/seed/${product.id}/800/600`} 
-                    alt={product.title} 
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80 group-hover:opacity-100"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-6 right-6 glass px-5 py-2 rounded-full micro-label text-white/60">
-                    {product.category}
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                </Link>
-                
-                <div className="p-6 md:p-10 flex-grow flex flex-col">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full glass flex items-center justify-center overflow-hidden border-white/10">
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${product.sellerId}`} className="w-full h-full object-cover opacity-80" referrerPolicy="no-referrer" />
+                <TiltCard className="flex-grow flex flex-col">
+                  <div className="premium-card p-0 overflow-hidden flex flex-col h-full">
+                    <Link to={`/product/${product.id}`} className="block relative aspect-[4/3] overflow-hidden">
+                      <img 
+                        src={product.thumbnailUrl || `https://picsum.photos/seed/${product.id}/800/600`} 
+                        alt={product.title} 
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 opacity-80 group-hover:opacity-100"
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute top-6 right-6 glass px-5 py-2 rounded-full micro-label text-white/60">
+                        {product.category}
                       </div>
-                      <span className="micro-label text-white/40">{product.sellerName}</span>
-                    </div>
-                    <div className="flex items-center gap-2 micro-label text-white/60">
-                      <Star className="w-3 h-3 fill-neon-blue text-neon-blue" />
-                      {product.rating || '5.0'}
-                    </div>
-                  </div>
-                  
-                  <h3 className="font-bold text-2xl mb-4 group-hover:text-neon-blue transition-colors uppercase tracking-tight">{product.title}</h3>
-                  <p className="text-white/30 line-clamp-2 mb-10 leading-relaxed text-sm">{product.description}</p>
-                  
-                  <div className="flex items-center justify-between mt-auto pt-8 border-t border-white/5">
-                    <div className="flex flex-col">
-                      <span className="micro-label mb-1">Price</span>
-                      <span className="text-3xl font-black tracking-tighter">${product.price}</span>
-                    </div>
-                    <Link to={`/product/${product.id}`} className="w-16 h-16 rounded-2xl glass flex items-center justify-center hover:bg-white hover:text-black transition-all duration-500 group/btn">
-                      <ShoppingCart className="w-6 h-6 group-hover/btn:scale-110 transition-transform" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </Link>
+                    
+                    <div className="p-6 md:p-10 flex-grow flex flex-col">
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full glass flex items-center justify-center overflow-hidden border-white/10">
+                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${product.sellerId}`} className="w-full h-full object-cover opacity-80" referrerPolicy="no-referrer" />
+                          </div>
+                          <span className="micro-label text-white/40">{product.sellerName}</span>
+                        </div>
+                        <div className="flex items-center gap-2 micro-label text-white/60">
+                          <Star className="w-3 h-3 fill-neon-blue text-neon-blue" />
+                          {product.rating || '5.0'}
+                        </div>
+                      </div>
+                      
+                      <h3 className="font-bold text-2xl mb-4 group-hover:text-neon-blue transition-colors uppercase tracking-tight">{product.title}</h3>
+                      <p className="text-white/30 line-clamp-2 mb-10 leading-relaxed text-sm">{product.description}</p>
+                      
+                      <div className="flex items-center justify-between mt-auto pt-8 border-t border-white/5">
+                        <div className="flex flex-col">
+                          <span className="micro-label mb-1">Price</span>
+                          <span className="text-3xl font-black tracking-tighter">${product.price}</span>
+                        </div>
+                        <Link to={`/product/${product.id}`} className="w-16 h-16 rounded-2xl glass flex items-center justify-center hover:bg-white hover:text-black transition-all duration-500 group/btn">
+                          <ShoppingCart className="w-6 h-6 group-hover/btn:scale-110 transition-transform" />
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </TiltCard>
               </motion.div>
             ))}
           </div>
