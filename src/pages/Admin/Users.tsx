@@ -98,7 +98,6 @@ export default function AdminUsers() {
           >
             <option value="all">All Roles</option>
             <option value="buyer">Buyers</option>
-            <option value="seller">Sellers</option>
             <option value="admin">Admins</option>
           </select>
         </div>
@@ -141,15 +140,9 @@ export default function AdminUsers() {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <select 
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className="bg-transparent text-xs font-black uppercase tracking-widest text-white/60 focus:outline-none hover:text-neon-blue transition-colors cursor-pointer"
-                    >
-                      <option value="buyer">Buyer</option>
-                      <option value="seller">Seller</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    <div className="text-xs font-black uppercase tracking-widest text-white/60">
+                      {user.role}
+                    </div>
                   </td>
                   <td className="px-8 py-6">
                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-[8px] font-black uppercase tracking-widest">

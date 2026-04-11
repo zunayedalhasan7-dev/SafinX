@@ -39,10 +39,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (userDoc.exists()) {
           const data = userDoc.data();
-          // Sync role if it's the admin email but role isn't admin
-          if (isAdminEmail && data.role !== 'admin') {
-            await setDoc(userDocRef, { ...data, role: 'admin' }, { merge: true });
-            setProfile({ ...data, role: 'admin' });
+          // Sync role if it's the admin email but role isn't admin, 
+          // OR if it's NOT the admin email but role IS admin (security fallback)
+          if ((isAdminEmail && data.role !== 'admin') || (!isAdminEmail && data.role === 'admin')) {
+            await setDoc(userDocRef, { ...data, role: targetRole }, { merge: true });
+            setProfile({ ...data, role: targetRole });
           } else {
             setProfile(data);
           }
@@ -72,8 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     profile,
     loading,
-    isAdmin: profile?.role === 'admin' || user?.email === 'xpzunayed@gmail.com',
-    isSeller: profile?.role === 'admin' || user?.email === 'xpzunayed@gmail.com', // Only admin can act as seller (add products)
+    isAdmin: user?.email === 'xpzunayed@gmail.com',
+    isSeller: user?.email === 'xpzunayed@gmail.com', // Only the specific admin email can act as seller/admin
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

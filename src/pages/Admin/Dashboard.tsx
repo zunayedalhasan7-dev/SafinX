@@ -68,7 +68,7 @@ export default function AdminDashboard() {
       
       setStats({
         totalUsers: usersSnap.size,
-        totalSellers: 1, // Only one admin
+        totalSellers: 1, // Only one admin (xpzunayed@gmail.com)
         totalProducts: productsSnap.size,
         totalOrders: ordersSnap.size,
         totalRevenue: totalRevenue
@@ -198,9 +198,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
-                    user.role === 'seller' ? 'bg-neon-purple/10 text-neon-purple' : 'bg-neon-blue/10 text-neon-blue'
-                  }`}>
+                  <span className="text-[8px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-neon-blue/10 text-neon-blue">
                     {user.role}
                   </span>
                 </div>
