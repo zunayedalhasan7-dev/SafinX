@@ -61,8 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     profile,
     loading,
-    isAdmin: profile?.role === 'admin' || user?.email === 'xpeee01@gmail.com',
-    isSeller: profile?.role === 'seller' || profile?.role === 'admin',
+    isAdmin: profile?.role === 'admin' || user?.email === 'xpzunayed@gmail.com',
+    isSeller: profile?.role === 'admin' || user?.email === 'xpzunayed@gmail.com', // Only admin can act as seller (add products)
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

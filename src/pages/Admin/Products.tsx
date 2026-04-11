@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { collection, query, getDocs, updateDoc, doc, deleteDoc, orderBy, where } from 'firebase/firestore';
-import { db, handleFirestoreError, OperationType } from '../../firebase';
-import { motion } from 'motion/react';
+import { collection, query, getDocs, updateDoc, doc, deleteDoc, orderBy, where, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage, handleFirestoreError, OperationType } from '../../firebase';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
   Filter, 
@@ -13,15 +14,38 @@ import {
   Edit, 
   ExternalLink,
   AlertTriangle,
-  Eye
+  Eye,
+  Plus,
+  X,
+  Upload,
+  DollarSign
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-hot-toast';
 
 export default function AdminProducts() {
+  const { user, profile } = useAuth();
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentProductId, setCurrentProductId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    price: '',
+    category: 'Ebooks',
+    status: 'approved'
+  });
+  const [thumbnail, setThumbnail] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -61,6 +85,96 @@ export default function AdminProducts() {
     }
   };
 
+  const handleOpenModal = (product?: any) => {
+    if (product) {
+      setIsEditing(true);
+      setCurrentProductId(product.id);
+      setFormData({
+        title: product.title,
+        description: product.description,
+        price: product.price.toString(),
+        category: product.category,
+        status: product.status
+      });
+    } else {
+      setIsEditing(false);
+      setCurrentProductId(null);
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        category: 'Ebooks',
+        status: 'approved'
+      });
+    }
+    setThumbnail(null);
+    setFile(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    
+    setSubmitting(true);
+    try {
+      let thumbnailUrl = isEditing ? products.find(p => p.id === currentProductId)?.thumbnailUrl : '';
+      let fileUrl = isEditing ? products.find(p => p.id === currentProductId)?.fileUrl : '';
+
+      if (thumbnail) {
+        const thumbRef = ref(storage, `thumbnails/admin/${Date.now()}_${thumbnail.name}`);
+        await uploadBytes(thumbRef, thumbnail);
+        thumbnailUrl = await getDownloadURL(thumbRef);
+      }
+
+      if (file) {
+        const fileRef = ref(storage, `products/admin/${Date.now()}_${file.name}`);
+        await uploadBytes(fileRef, file);
+        fileUrl = await getDownloadURL(fileRef);
+      }
+
+      if (!thumbnailUrl || !fileUrl) {
+        toast.error('Thumbnail and Asset File are required');
+        setSubmitting(false);
+        return;
+      }
+
+      const productData = {
+        title: formData.title,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        status: formData.status,
+        thumbnailUrl,
+        fileUrl,
+        sellerId: user.uid,
+        sellerName: profile?.displayName || 'Admin',
+        updatedAt: serverTimestamp(),
+      };
+
+      if (isEditing && currentProductId) {
+        await updateDoc(doc(db, 'products', currentProductId), productData);
+        toast.success('Product updated successfully');
+      } else {
+        await addDoc(collection(db, 'products'), {
+          ...productData,
+          rating: 5.0,
+          reviewCount: 0,
+          salesCount: 0,
+          createdAt: serverTimestamp(),
+        });
+        toast.success('Product added successfully');
+      }
+
+      setIsModalOpen(false);
+      fetchProducts();
+    } catch (err) {
+      handleFirestoreError(err, isEditing ? OperationType.UPDATE : OperationType.CREATE, 'products');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = 
       product.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -78,6 +192,13 @@ export default function AdminProducts() {
         </div>
         
         <div className="flex flex-wrap items-center gap-4">
+          <button 
+            onClick={() => handleOpenModal()}
+            className="btn-primary flex items-center gap-2 px-6 py-2.5 text-[10px]"
+          >
+            <Plus className="w-4 h-4" /> Add Product
+          </button>
+          
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 group-focus-within:text-neon-blue transition-colors" />
             <input 
@@ -181,7 +302,11 @@ export default function AdminProducts() {
                           <XCircle className="w-4 h-4" />
                         </button>
                       )}
-                      <button className="p-2 glass rounded-lg text-white/20 hover:text-white transition-colors" title="Edit">
+                      <button 
+                        onClick={() => handleOpenModal(product)}
+                        className="p-2 glass rounded-lg text-white/20 hover:text-white transition-colors" 
+                        title="Edit"
+                      >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
@@ -206,6 +331,150 @@ export default function AdminProducts() {
           </div>
         )}
       </div>
+
+      {/* Add/Edit Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsModalOpen(false)}
+              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="glass w-full max-w-2xl rounded-[40px] border-white/10 p-8 sm:p-12 relative z-10 max-h-[90vh] overflow-y-auto shadow-[0_50px_100px_-20px_rgba(0,0,0,1)]"
+            >
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="absolute top-8 right-8 p-2 glass rounded-xl text-white/20 hover:text-white transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              <h2 className="text-3xl font-display uppercase tracking-tighter mb-10">
+                {isEditing ? 'Edit' : 'Add New'} <span className="neon-text">Product</span>
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Title</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={formData.title}
+                      onChange={(e) => setFormData({...formData, title: e.target.value})}
+                      className="w-full glass border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:border-white/20 transition-all font-bold"
+                      placeholder="Product Title"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Price (USD)</label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                      <input 
+                        required
+                        type="number" 
+                        step="0.01"
+                        value={formData.price}
+                        onChange={(e) => setFormData({...formData, price: e.target.value})}
+                        className="w-full glass border-white/5 rounded-2xl pl-12 pr-6 py-4 focus:outline-none focus:border-white/20 transition-all font-bold"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Category</label>
+                    <select 
+                      value={formData.category}
+                      onChange={(e) => setFormData({...formData, category: e.target.value})}
+                      className="w-full glass border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:border-white/20 transition-all micro-label text-white/40"
+                    >
+                      <option value="Ebooks">Ebooks</option>
+                      <option value="Courses">Courses</option>
+                      <option value="Templates">Templates</option>
+                      <option value="Software">Software</option>
+                      <option value="Design Assets">Design Assets</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Status</label>
+                    <select 
+                      value={formData.status}
+                      onChange={(e) => setFormData({...formData, status: e.target.value as any})}
+                      className="w-full glass border-white/5 rounded-2xl px-6 py-4 focus:outline-none focus:border-white/20 transition-all micro-label text-white/40"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="micro-label ml-2">Description</label>
+                  <textarea 
+                    required
+                    rows={4}
+                    value={formData.description}
+                    onChange={(e) => setFormData({...formData, description: e.target.value})}
+                    className="w-full glass border-white/5 rounded-3xl px-6 py-4 focus:outline-none focus:border-white/20 transition-all resize-none"
+                    placeholder="Product description..."
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Thumbnail {isEditing && '(Optional)'}</label>
+                    <div className="relative group cursor-pointer">
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => setThumbnail(e.target.files?.[0] || null)}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="w-full h-32 glass border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center group-hover:border-neon-blue/20 transition-all">
+                        <Upload className="w-6 h-6 text-white/10 mb-2" />
+                        <span className="text-[10px] micro-label text-white/20">{thumbnail ? thumbnail.name : 'Select Image'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="micro-label ml-2">Asset File {isEditing && '(Optional)'}</label>
+                    <div className="relative group cursor-pointer">
+                      <input 
+                        type="file" 
+                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="w-full h-32 glass border-2 border-dashed border-white/5 rounded-3xl flex flex-col items-center justify-center group-hover:border-neon-purple/20 transition-all">
+                        <Package className="w-6 h-6 text-white/10 mb-2" />
+                        <span className="text-[10px] micro-label text-white/20">{file ? file.name : 'Select File'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={submitting}
+                  className="btn-primary w-full py-5 flex items-center justify-center gap-4 disabled:opacity-50"
+                >
+                  {submitting ? 'Processing...' : (isEditing ? 'Update Product' : 'Add Product')}
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

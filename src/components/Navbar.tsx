@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { auth } from '../firebase';
-import { ShoppingCart, User, LogOut, LayoutDashboard, Heart, Menu, X, MoreVertical } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Heart, Menu, X, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import MoreMenu from './MoreMenu';
 
 export default function Navbar() {
-  const { user, profile } = useAuth();
+  const { user, profile, isAdmin } = useAuth();
   const { cart } = useCart();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -36,6 +36,7 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-12">
           <Link to="/marketplace" className="micro-label hover:text-white transition-all hover:tracking-[0.6em]">Marketplace</Link>
           {user && <Link to="/dashboard" className="micro-label text-neon-blue hover:text-white transition-all hover:tracking-[0.6em]">Dashboard</Link>}
+          {isAdmin && <Link to="/admin" className="micro-label text-neon-purple hover:text-white transition-all hover:tracking-[0.6em]">Admin Panel</Link>}
         </div>
 
         <div className="flex items-center gap-2 md:gap-4 lg:gap-8">
@@ -72,6 +73,11 @@ export default function Navbar() {
                 <Link to="/dashboard" className="flex items-center gap-4 px-4 py-3 hover:bg-white/5 rounded-2xl text-sm transition-colors">
                   <LayoutDashboard className="w-4 h-4 text-white/30" /> Dashboard
                 </Link>
+                {isAdmin && (
+                  <Link to="/admin" className="flex items-center gap-4 px-4 py-3 hover:bg-white/5 rounded-2xl text-sm transition-colors text-neon-purple">
+                    <ShieldCheck className="w-4 h-4" /> Admin Panel
+                  </Link>
+                )}
                 <div className="h-px bg-white/5 my-2" />
                 <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-3 hover:bg-red-500/10 text-red-400 rounded-2xl text-sm transition-colors">
                   <LogOut className="w-4 h-4" /> Logout
@@ -105,6 +111,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-8">
               <Link onClick={() => setIsMenuOpen(false)} to="/marketplace" className="text-3xl font-display uppercase tracking-tighter">Marketplace</Link>
               {user && <Link onClick={() => setIsMenuOpen(false)} to="/dashboard" className="text-3xl font-display uppercase tracking-tighter text-neon-blue">Dashboard</Link>}
+              {isAdmin && <Link onClick={() => setIsMenuOpen(false)} to="/admin" className="text-3xl font-display uppercase tracking-tighter text-neon-purple">Admin Panel</Link>}
               
               <div className="h-px bg-white/5 my-4" />
               

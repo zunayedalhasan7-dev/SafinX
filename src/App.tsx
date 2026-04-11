@@ -11,7 +11,7 @@ import Layout from './components/Layout';
 import Home from './pages/Home';
 import Marketplace from './pages/Marketplace';
 import ProductDetails from './pages/ProductDetails';
-import Dashboard from './pages/Dashboard';
+import UserDashboard from './pages/UserDashboard';
 import Auth from './pages/Auth';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -27,13 +27,12 @@ import ScrollToTop from './components/ScrollToTop';
 import CookieConsent from './components/CookieConsent';
 
 const PrivateRoute = ({ children, role }: { children: React.ReactNode, role?: string }) => {
-  const { user, profile, loading, isAdmin, isSeller } = useAuth();
+  const { user, profile, loading, isAdmin } = useAuth();
 
   if (loading) return <div className="h-screen w-screen flex items-center justify-center bg-black text-white">Loading...</div>;
   if (!user) return <Navigate to="/auth" />;
   
   if (role === 'admin' && !isAdmin) return <Navigate to="/" />;
-  if (role === 'seller' && !isSeller) return <Navigate to="/" />;
 
   return <>{children}</>;
 };
@@ -69,7 +68,7 @@ export default function App() {
               
               <Route path="/dashboard/*" element={
                 <PrivateRoute>
-                  <Dashboard />
+                  <UserDashboard />
                 </PrivateRoute>
               } />
               

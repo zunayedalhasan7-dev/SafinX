@@ -59,15 +59,19 @@ export default function AdminDashboard() {
       // In a real app, these would be aggregated or fetched from a stats collection
       const usersSnap = await getDocs(collection(db, 'users'));
       const productsSnap = await getDocs(collection(db, 'products'));
+      const ordersSnap = await getDocs(collection(db, 'orders'));
       
-      const sellers = usersSnap.docs.filter(doc => doc.data().role === 'seller' || doc.data().role === 'admin').length;
+      let totalRevenue = 0;
+      ordersSnap.forEach(doc => {
+        totalRevenue += doc.data().price || 0;
+      });
       
       setStats({
         totalUsers: usersSnap.size,
-        totalSellers: sellers,
+        totalSellers: 1, // Only one admin
         totalProducts: productsSnap.size,
-        totalOrders: 156, // Mock for now
-        totalRevenue: 12450 // Mock for now
+        totalOrders: ordersSnap.size,
+        totalRevenue: totalRevenue
       });
 
       // Recent Users
